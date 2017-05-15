@@ -319,11 +319,16 @@ void handleGetRequest( String lineOne, WiFiClient client ) {
   String path = lineOne.substring( 4, endOfPath );
   String message = "Sweet get request brah.";
   client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n" + message + "\r\n" );
+  //Check if there is a query string
   int queryStringDelimiter = path.indexOf('?');
   String queryString = "";
-  if( queryStringDelimiter >= 0 ) {
+  if( queryStringDelimiter >= 0 && path.length() > queryStringDelimiter ) {
     queryString = path.substring( queryStringDelimiter + 1 );
   }
+  if( queryString.length() > 0 ) {
+    //parse query string
+  }
+  //Do the action
 }
 
 void handlePostRequest( String lineOne, WiFiClient client ) {
@@ -332,4 +337,6 @@ void handlePostRequest( String lineOne, WiFiClient client ) {
   String message = "Sweet post request brah.";
   client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n" + message + "\r\n" );
   //Find blank line, the body starts after that.
+  //Parse the body
+  //Do the action
 }
