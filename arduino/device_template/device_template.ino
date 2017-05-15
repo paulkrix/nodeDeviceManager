@@ -271,19 +271,31 @@ void readFromClient() {
   }
 
   // Read the first line of the request
-  String req = client.readStringUntil('\r');
-  Serial.println(req);
+  String reqestLine = client.readStringUntil('\n');
+  reqestLine.trim();
+  Serial.println(reqestLine);
   client.flush();
 
-  String message = "unknown";
-  if (req.indexOf("/status") != -1) {
-    message = "running";
-  } else {
-    client.stop();
-    return;
+  //Check what protocol the request is
+  if( reqestLine.substring(0, 3) == "GET" ) {
+    handleGetRequest( requestLine, client );
   }
+  if( reqestLine.substring(0, 4) == "POST" ) {
+    handlePostRequest( requestLine, client );
+  }
+  //Unhandled protocol, just ignore it.
+  client.stop();
+  return;
 
-  client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n" + message + "\r\n" );
+  // String message = "unknown";
+  // if (reqestLine.indexOf("/status") != -1) {
+  //   message = "running";
+  // } else {
+  //   client.stop();
+  //   return;
+  // }
+  //
+  // client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n" + message + "\r\n" );
 
 
   // Match the request
@@ -299,4 +311,25 @@ void readFromClient() {
 //    return;
 //  }
 
+}
+
+
+void handleGetRequest( String lineOne, WiFiClient client ) {
+  int endOfPath = lineOne.substring( 4 ).indexOf(' ');
+  String path = lineOne.substring( 4, endOfPath );
+  String message = "Sweet get request brah.";
+  client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n" + message + "\r\n" );
+  int queryStringDelimiter = path.indexOf('?');
+  String queryString = "";
+  if( queryStringDelimiter >= 0 ) {
+    queryString = path.substring( queryStringDelimiter + 1 );
+  }
+}
+
+void handlePostRequest( String lineOne, WiFiClient client ) {
+  int endOfPath = lineOne.substring( 5 ).indexOf(' ');
+  String path = lineOne.substring( 5, endOfPath );
+  String message = "Sweet post request brah.";
+  client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n" + message + "\r\n" );
+  //Find blank line, the body starts after that.
 }
